@@ -5,8 +5,11 @@ using namespace vhuk;
 
 template <typename T>
 std::ostream& FrankList::operator<<(std::ostream& out, const FrankList<T>& rhv)
-{
-	return out << rhv;
+{	
+	for(auto it = rhv.begin(); it != rhv.end(); ++it){
+		out << *it;
+	}
+	return out;
 }
 
 
@@ -142,5 +145,168 @@ explicit FrankList::const_desc_iterator::const_desc_iterator(Node* ptr){this->pt
 //DESC_ITERATOR
 desc_iterator(const base_iterator& rhv);
 
-//sa link kist a u ++ptr nety poxel a petq 
+
+
+//Construcors Franclist
+template <typename T>
+FrankList<T>::FrankList(){
+	this->head = nullptr;
+	this->tail = nullptr;
+	this->ahead = nullptr;
+	this->htail = nullptr;	
+}
+
+template <typename T>
+FrankList<T>::FrankList(size_type size) : FrancList() {
+	for(int i = 0; i != size; ++i){
+		push_back (T( ));
+	} 
+} 
+
+template <typename T>
+FrankList<T>::FrankList(size_type size, const_reference init) : FrancList() {
+	for(int i = 0; i != size; ++i){
+		push_back (init);
+	}
+}
+
+template <typename T>
+FrankList<T>::FrankList(const FrankList<value_type>& rhv) : FrancList() 
+{
+	for(auto it = rhv.begin(); it != rhv.end(); ++it){
+		push_back(*it);
+	} 
+}
+
+
+template <typename T>
+FrankList<T>::FrankList(FrankList<value_type>&& rhv) 
+{
+	this->head = rhv.head;
+	this->tail = rhv.tail;	
+	this->ahead = rhv.ahead;
+	this->atail = rhv.atail;
+	rhv.head = nullptr;
+	rhv.tail = nullptr;
+	rhv.ahead = nullptr;
+	rhv.atail = nullptr;
+}
+
+template <typename T>
+FrankList<T>::FrankList(std::initializer_list<value_type> init) :FrancList() {
+	for(const auto i& : init){
+		push_back(i);
+	}
+}
+
+template <typename T>
+template <typename input_iterator>
+FrankList<T>::FrankList(input_iterator f, input_iterator l)
+{
+	for(input_iterator it = f; it != l; ++it){
+		push_back(*it);
+	}
+}
+
+
+template <typename T>
+FrankList<T>::~FrankList()
+{
+	Node* i = head;
+	while(i != nullptr){
+		Node* next = i->next;
+		delete i;
+		i = next;
+	}
+
+	this->head = nullptr;
+	this->tail = nullptr;
+	this->ahead = nullptr;
+	this->atail = nullptr;	
+}
+
+
+template <typename T>
+void FrankList<T>::swap(FrankList<value_type>& rhv)
+{
+	std::swap(this->head = rhv.head);
+	std::swap(this->tail = rhv.tail);
+	std::swap(this->ahead = rhv.ahead);
+	std::swap(this->atail = rhv.atail);
+}
+
+template <typename T>
+size_type FrankList<T>::size() const
+{
+	size_type count = 0;
+	Node* tmp = head;
+	while(tmp)
+	{
+		++count;
+		tmp = tmp -> next;
+	}
+	return count;
+}
+
+
+template <typename T>
+bool FrankList<T>::empty() const
+{
+	return head == nullptr;
+}
+
+template <typename T>
+void FrankList<T>::resize(size_type s, const_reference init = value_type()){
+	size_type size = this -> size();
+	if(s < size){
+		while(s){
+			this->pop_back;
+			--s;
+		}
+	}else if(s > size){
+		while(s){
+			this->push_back(init);
+			--s;
+		}
+	}
+}
+
+
+template <typename T>
+void FrankList<T>::clear() noexcept{
+	Node* tmp = head;
+
+	while(tmp)
+	{	Node* next = tmp->next;
+		delete tmp;
+		tmp =  next;
+	}
+
+	this -> head = nullptr;
+	this -> tail = nullptr;
+	this -> ahead = nullptr;
+	this -> atail = nullptr;
+}
+
+
+template <typename T>
+void FrankList<T>::push_front(const_reference elem){
+
+	Node* tmp = new Node(elem);
+	if(head){
+		this->head->prev = tmp;
+	}else{
+		this->tail = tmp;	
+	}  
+	tmp->next = this -> head;
+	this -> head = tmp;  
+}
+
+
+
+template <typename T>
+
+
+
+//sa link list a u ++ptr nety poxel a petq 
 #endif //_FRANKLIST_HPP__
