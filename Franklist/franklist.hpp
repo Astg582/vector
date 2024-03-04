@@ -208,7 +208,7 @@ FrankList<T>::FrankList(input_iterator f, input_iterator l)
 	}
 }
 
-
+//~FrankList
 template <typename T>
 FrankList<T>::~FrankList()
 {
@@ -225,7 +225,7 @@ FrankList<T>::~FrankList()
 	this->atail = nullptr;	
 }
 
-
+//SWAP
 template <typename T>
 void FrankList<T>::swap(FrankList<value_type>& rhv)
 {
@@ -235,6 +235,7 @@ void FrankList<T>::swap(FrankList<value_type>& rhv)
 	std::swap(this->atail = rhv.atail);
 }
 
+//SIZE
 template <typename T>
 size_type FrankList<T>::size() const
 {
@@ -248,13 +249,15 @@ size_type FrankList<T>::size() const
 	return count;
 }
 
-
+//EMPTY
 template <typename T>
 bool FrankList<T>::empty() const
 {
 	return head == nullptr;
 }
 
+
+//RESIZE
 template <typename T>
 void FrankList<T>::resize(size_type s, const_reference init = value_type()){
 	size_type size = this -> size();
@@ -269,9 +272,10 @@ void FrankList<T>::resize(size_type s, const_reference init = value_type()){
 			--s;
 		}
 	}
+	sort();
 }
 
-
+//Clear
 template <typename T>
 void FrankList<T>::clear() noexcept{
 	Node* tmp = head;
@@ -288,23 +292,188 @@ void FrankList<T>::clear() noexcept{
 	this -> atail = nullptr;
 }
 
-
+//push front
 template <typename T>
 void FrankList<T>::push_front(const_reference elem){
 
-	Node* tmp = new Node(elem);
-	if(head){
+	node* tmp = new node(elem);
+	if(this -> head){
 		this->head->prev = tmp;
 	}else{
 		this->tail = tmp;	
 	}  
 	tmp->next = this -> head;
-	this -> head = tmp;  
+	this -> head = tmp; 
+	sort();
+}
+
+//pop back
+template <typename T>
+void FrankList<T>::pop_front(){
+	if(head){
+		Node* newHead = head->next;
+		delete head;
+		this -> head = newHead;
+		if(this -> head){
+			head->prev = nullptr;
+		}
+		sort();
+	}
+}
+
+//push back
+template <typename T>
+void FrankList<T>::push_back(const_reference elem){
+	Node* tmp = new node(elem);
+	if(!(this -> head)){
+		this->head = tmp;
+	}else{
+		this -> tail -> next = tmp;
+		tmp -> prev = this -> tail;	
+	}  
+
+	this -> tail = tmp; 
+	sort();
 }
 
 
-
+//pop back
 template <typename T>
+void FrankList<T>::pop_back(){
+	if (tail) {
+        	Node* newTail = tail->prev;
+       		delete tail;
+        	tail = newTail;
+        	if (tail) {
+            		tail->next = nullptr;
+        	}
+        sort();
+    }
+}
+
+// front
+template <typename T>
+const_reference T& FrankList<T>::front() const{
+	if(this->empty()){
+		throw std::out_of_range("List is empty" );
+	}
+	return this -> head -> val;
+}
+
+
+// front
+template <typename T>
+reference T& FrankList<T>::front(){
+   if (!head) {
+        throw std::out_of_range("List is empty");
+    }
+    return this -> head -> val;
+}
+
+
+//back
+template <typename T>
+const_reference T& FrankList<T>::back() const{
+	if(!tail){
+		throw std::out_of_range("List is empty");
+	}
+	return this -> tail -> val;
+}
+
+
+//back
+template <typename T>
+reference T& FrankList<T>::back(){
+ if (!tail) {
+        throw std::out_of_range("List is empty");
+    }
+    return this-> tail -> val;
+}
+
+//min (const)
+template <typename T>
+typename FrankList<T>::const_reference FrankList<T>::min() const {
+    if (!head) {
+        throw std::out_of_range("List is empty");
+    }
+
+    Node* current = head;
+    T minValue = current -> val;
+
+    while (current) {
+        if (current -> val < minValue) {
+            minValue = current -> val;
+        }
+	current = current->next;
+    }
+    return minValue;
+}
+
+
+//min (not const)
+template <typename T>
+typename FrankList<T>::reference FrankList<T>::min() {
+    if (!head) {
+        throw std::out_of_range("List is empty");
+    }
+
+    Node* current = head;
+    T minValue = current -> val;
+
+    while (current) {
+        if (current -> val < minValue) {
+            minValue = current -> val;
+        }
+	current = current->next;
+    }
+    return minValue;
+}
+
+//max (const)
+template <typename T>
+typename FrankList<T>::const_reference FrankList<T>::max() const {
+    if (!head) {
+        throw std::out_of_range("List is empty");
+    }
+
+    Node* current = head;
+    T maxValue = current -> val;
+
+    while (current) {
+        if (current -> val >  maxValue) {
+            maxValue = current -> val;
+        }
+	current = current->next;
+    }
+    return maxValue;
+}
+
+
+//max (not const)
+template <typename T>
+typename FrankList<T>::reference FrankList<T>::max(){
+    if (!head) {
+        throw std::out_of_range("List is empty");
+    }
+
+    Node* current = head;
+    T maxValue = current -> val;
+
+    while (current) {
+        if (current -> val >  maxValue) {
+            maxValue = current -> val;
+        }
+	current = current->next;
+    }
+    return maxValue;
+}
+
+
+//operator =
+template <typename T>
+const FrankList<value_type>& FrankList<T>::operator=(const FrankList<value_type>& rhv){
+
+}
 
 
 
