@@ -165,6 +165,7 @@ FrankList<T>::FrankList(size_type size) : FrancList() {
 
 template <typename T>
 FrankList<T>::FrankList(size_type size, const_reference init) : FrancList() {
+
 	for(int i = 0; i != size; ++i){
 		push_back (init);
 	}
@@ -212,17 +213,7 @@ FrankList<T>::FrankList(input_iterator f, input_iterator l)
 template <typename T>
 FrankList<T>::~FrankList()
 {
-	Node* i = head;
-	while(i != nullptr){
-		Node* next = i->next;
-		delete i;
-		i = next;
-	}
-
-	this->head = nullptr;
-	this->tail = nullptr;
-	this->ahead = nullptr;
-	this->atail = nullptr;	
+	this->clear();
 }
 
 //SWAP
@@ -469,13 +460,114 @@ typename FrankList<T>::reference FrankList<T>::max(){
 }
 
 
-//operator =
+//operator = (copy)
 template <typename T>
 const FrankList<value_type>& FrankList<T>::operator=(const FrankList<value_type>& rhv){
+	this -> clear();
+	for(auto it = rhv.begin(); it != rhv.end(); ++it){
+		push_back(*it);
+	}
+	return *this; 
+}
 
+//operator = (accign)
+template <typename T>
+const FrankList<value_type>& FrankList<T>::operator=(FrankList<value_type>&& rhv){
+	this->clear();
+
+	this->head = rhv.head;
+	this->tail = rhv.tail;	
+	this->ahead = rhv.ahead;
+	this->atail = rhv.atail;
+	rhv.head = nullptr;
+	rhv.tail = nullptr;
+	rhv.ahead = nullptr;
+	rhv.atail = nullptr;
+	return *this;
 }
 
 
+//operator = (initial)
+template <typename T>
+const FrankList<value_type>& FrankList<T>::operator=(std::initializer_list<value_type> init) {
+	this->clear();
 
-//sa link list a u ++ptr nety poxel a petq 
+	for (const auto& value : init) {
+        	push_back(value);
+	}
+
+	return *this;
+}
+
+
+//operator ==
+template <typename T>
+bool FrankList<T>::operator==(const FrankList<value_type>& rhv) const{
+	if(this->size() != rhv.size()){
+		return false;
+	}
+
+	auto it1 = this->begin();
+	auto it2 = rhv.begin();
+
+	while(it1 != this->end() && it2 !=rhv.end()){
+		if(*it1 != *it2){
+			return false;
+		} 
+		++it1;
+		++it2;
+	} 
+	return (it1 == this->end() && it2 == rhv.end());
+}
+
+//operator !=
+template <typename T>
+bool FrankList<T>::operator!=(const FrankList<value_type>& rhv) const {
+	return !(*this == rhv);
+}
+
+//operator <
+template <typename T>
+bool FrankList<T>::operator<(const FrankList<value_type>& rhv) const template <typename T>
+{
+	auto it1 = this->begin();
+	auto it2 = rhv.begin();
+	auto size = (this->size() <= rhv.size()) ? this->end() : rhv.end();
+
+	while(it1 != size && it2 != size){
+		if(*it1 >= *it2){
+			return false;
+		} 
+		++it1;
+		++it2;
+	} 
+	
+	 return (it1 == size && it2 != size);
+}
+
+//operator <=
+template <typename T>
+bool operator<=(const FrankList<value_type>& rhv) const{
+	return (*this < rhv) || (*this == rhv);
+}
+
+//operator >=
+template <typename T>
+bool FrankList<T>::operator<=(const FrankList<value_type>& rhv) const{
+	return !(*this < rhv);
+}
+
+//operator >
+template <typename T>
+bool FrankList<T>::operator<(const FrankList<value_type>& rhv) const{
+	return !(*this <= rhv); 
+}
+
+
+// iterator cbegin
+template <typename T>
+const_iterator FrankList<T>::cbegin() const{
+
+}
+
 #endif //_FRANKLIST_HPP__
