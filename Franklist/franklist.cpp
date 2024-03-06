@@ -1,26 +1,61 @@
-#ifndef _FRANKLIST_HPP__
-#define _FRANKLIST_HPP__
+#ifndef _FRANKLIST_CPP__
+#define _FRANKLIST_CPP_
+
+#include "franklist.h"
 
 namespace vhuk{
 
 //Construcors Franclist
 template <typename T>
-FrankList<T>::FrankList(){
+vhuk::FrankList<T>::FrankList() {
 	this->head = nullptr;
 	this->tail = nullptr;
 	this->ahead = nullptr;
 	this->htail = nullptr;	
 }
 
-template <typename T>
-FrankList<T>::FrankList(size_type size) : FrancList() {
-	for(int i = 0; i != size; ++i){
-		push_back (T( ));
-	} 
-} 
 
 template <typename T>
-FrankList<T>::FrankList(size_type size, const_reference init) : FrancList() {
+vhuk::FrankList<T>::Node::Node()
+    : val(T())
+    , next(nullptr)
+    , prev(nullptr)
+    , asc(nullptr)
+    , desc(nullptr)
+{}
+
+template <typename T>
+vhuk::FrankList<T>::Node::Node(T val)
+    : val(val)
+    , next(nullptr)
+    , prev(nullptr)
+    , asc(nullptr)
+    , desc(nullptr)
+{}
+
+//operator << out
+template <typename T>
+std::ostream& vhuk::operator<<(std::ostream& out, const FrankList<T>& rhv)
+{
+    out << "[";
+    for (auto it = rhv.cbegin(); it != rhv.cend(); ++it) {
+        out << *it << " ";
+    }
+    out << "]";
+    return out;
+}
+
+
+
+template <typename T>
+vhuk::FrankList<T>::FrankList(size_type size) : vhuk::FrankList<T>::FrankList() {
+    for(int i = 0; i != size; ++i) {
+        push_back(T());
+    }
+}
+
+template <typename T>
+vhuk::FrankList<T>::FrankList(size_type size, const_reference init) : vhuk::FrankList<T>::FrancList() {
 
 	for(int i = 0; i != size; ++i){
 		push_back (init);
@@ -28,7 +63,7 @@ FrankList<T>::FrankList(size_type size, const_reference init) : FrancList() {
 }
 
 template <typename T>
-FrankList<T>::FrankList(const FrankList<value_type>& rhv) : FrancList() 
+vhuk::FrankList<T>::FrankList(const FrankList<value_type>& rhv) : vhuk::FrankList<T>::FrancList() 
 {
 	for(auto it = rhv.begin(); it != rhv.end(); ++it){
 		push_back(*it);
@@ -37,12 +72,12 @@ FrankList<T>::FrankList(const FrankList<value_type>& rhv) : FrancList()
 
 
 template <typename T>
-FrankList<T>::FrankList(FrankList<value_type>&& rhv) 
+vhuk::FrankList<T>::FrankList(FrankList<value_type>&& rhv) 
 
-	: this->head(rhv.head) 
-	, this->tail(rhv.tail) 	
-	, this->ahead(rhv.ahead) 
-	, this->atail(rhv.atail) 
+	: head(rhv.head) 
+	, tail(rhv.tail) 	
+	, ahead(rhv.ahead) 
+	, atail(rhv.atail) 
 {
 	rhv.head = nullptr;
 	rhv.tail = nullptr;
@@ -51,15 +86,15 @@ FrankList<T>::FrankList(FrankList<value_type>&& rhv)
 }
 
 template <typename T>
-FrankList<T>::FrankList(std::initializer_list<value_type> init) :FrancList() {
-	for(const auto i& : init){
+vhuk::FrankList<T>::FrankList(std::initializer_list<value_type> init) : vhuk::FrankList<T>::FrancList() {
+	for(const auto& i : init){
 		push_back(i);
 	}
 }
 
 template <typename T>
 template <typename input_iterator>
-FrankList<T>::FrankList(input_iterator f, input_iterator l) :FrancList()
+vhuk::FrankList<T>::FrankList(input_iterator f, input_iterator l) : vhuk::FrankList<T>::FrancList()
 {
 	for(input_iterator it = f; it != l; ++it){
 		push_back(*it);
@@ -68,14 +103,14 @@ FrankList<T>::FrankList(input_iterator f, input_iterator l) :FrancList()
 
 //~FrankList
 template <typename T>
-FrankList<T>::~FrankList()
+vhuk::FrankList<T>::~FrankList()
 {
 	this->clear();
 }
 
 //SWAP
 template <typename T>
-void FrankList<T>::swap(FrankList<value_type>& rhv)
+void vhuk::FrankList<T>::swap(FrankList<value_type>& rhv)
 {
 	std::swap(this->head = rhv.head);
 	std::swap(this->tail = rhv.tail);
@@ -85,7 +120,7 @@ void FrankList<T>::swap(FrankList<value_type>& rhv)
 
 //SIZE
 template <typename T>
-typename FrankList<T>::size_type FrankList<T>::size() const
+typename vhuk::FrankList<T>::size_type vhuk::FrankList<T>::size() const
 {
 	size_type count = 0;
 	Node* tmp = head;
@@ -99,7 +134,7 @@ typename FrankList<T>::size_type FrankList<T>::size() const
 
 //EMPTY
 template <typename T>
-bool FrankList<T>::empty() const
+bool vhuk::FrankList<T>::empty() const
 {
 	return this->head == nullptr;
 }
@@ -107,7 +142,7 @@ bool FrankList<T>::empty() const
 
 //RESIZE
 template <typename T>
-void FrankList<T>::resize(size_type s, const_reference init = value_type()){
+void vhuk::FrankList<T>::resize(size_type s, const_reference init){
 	size_type size = this -> size();
 	if(s < size){
 		while(s){
@@ -125,7 +160,7 @@ void FrankList<T>::resize(size_type s, const_reference init = value_type()){
 
 //Clear
 template <typename T>
-void FrankList<T>::clear() noexcept{
+void vhuk::FrankList<T>::clear() noexcept{
 	Node* tmp = head;
 
 	while(tmp)
@@ -142,9 +177,9 @@ void FrankList<T>::clear() noexcept{
 
 //push front
 template <typename T>
-void FrankList<T>::push_front(const_reference elem){
+void vhuk::FrankList<T>::push_front(const_reference elem){
 
-	node* tmp = new node(elem);
+	Node* tmp = new Node(elem);
 	if(this -> head){
 		this->head->prev = tmp;
 	}else{
@@ -158,7 +193,7 @@ void FrankList<T>::push_front(const_reference elem){
 
 //pop back
 template <typename T>
-void FrankList<T>::pop_front() {
+void vhuk::FrankList<T>::pop_front() {
     if (!this->head) {
         throw std::invalid_argument("List is empty");
     }
@@ -184,7 +219,7 @@ void FrankList<T>::pop_front() {
 
 //push back
 template <typename T>
-void FrankList<T>::push_back(const_reference elem){
+void vhuk::FrankList<T>::push_back(const_reference elem){
 	Node* tmp = new Node(elem);
 	if(!(this -> head)){
 		this->head = tmp;
@@ -200,7 +235,7 @@ void FrankList<T>::push_back(const_reference elem){
 
 //pop back
 template <typename T>
-void FrankList<T>::pop_back(){
+void vhuk::FrankList<T>::pop_back(){
 	if (!this->head) {
         	throw std::invalid_argument("List is empty");
 	}
@@ -224,7 +259,7 @@ void FrankList<T>::pop_back(){
 
 // front
 template <typename T>
-typename FrankList<T>::const_reference T& FrankList<T>::front() const{
+typename vhuk::FrankList<T>::const_reference  vhuk::FrankList<T>::front() const{
 	if(this->empty()){
 		throw std::out_of_range("List is empty" );
 	}
@@ -234,7 +269,7 @@ typename FrankList<T>::const_reference T& FrankList<T>::front() const{
 
 // front
 template <typename T>
-typename FrankList<T>::reference T& FrankList<T>::front(){
+typename vhuk::FrankList<T>::reference  vhuk::FrankList<T>::front(){
    if (!head) {
         throw std::out_of_range("List is empty");
     }
@@ -244,7 +279,7 @@ typename FrankList<T>::reference T& FrankList<T>::front(){
 
 //back
 template <typename T>
-typename FrankList<T>::const_reference T& FrankList<T>::back() const{
+typename vhuk::FrankList<T>::const_reference  vhuk::FrankList<T>::back() const{
 	if(!tail){
 		throw std::out_of_range("List is empty");
 	}
@@ -254,7 +289,7 @@ typename FrankList<T>::const_reference T& FrankList<T>::back() const{
 
 //back
 template <typename T>
-typename FrankList<T>::reference T& FrankList<T>::back(){
+typename vhuk::FrankList<T>::reference  vhuk::FrankList<T>::back(){
  if (!tail) {
         throw std::out_of_range("List is empty");
     }
@@ -263,7 +298,7 @@ typename FrankList<T>::reference T& FrankList<T>::back(){
 
 //min (const)
 template <typename T>
-typename FrankList<T>::const_reference FrankList<T>::min() const {
+typename vhuk::FrankList<T>::const_reference vhuk::FrankList<T>::min() const {
     if (!head) {
         throw std::out_of_range("List is empty");
     }
@@ -274,7 +309,7 @@ typename FrankList<T>::const_reference FrankList<T>::min() const {
 
 //min (not const)
 template <typename T>
-typename FrankList<T>::reference FrankList<T>::min() {
+typename vhuk::FrankList<T>::reference vhuk::FrankList<T>::min() {
     if (!head) {
         throw std::out_of_range("List is empty");
     }
@@ -284,7 +319,7 @@ typename FrankList<T>::reference FrankList<T>::min() {
 
 //max (const)
 template <typename T>
-typename FrankList<T>::const_reference FrankList<T>::max() const {
+typename vhuk::FrankList<T>::const_reference vhuk::FrankList<T>::max() const {
     if (!head) {
         throw std::out_of_range("List is empty");
     }
@@ -295,7 +330,7 @@ typename FrankList<T>::const_reference FrankList<T>::max() const {
 
 //max (not const)
 template <typename T>
-typename FrankList<T>::reference FrankList<T>::max(){
+typename vhuk::FrankList<T>::reference vhuk::FrankList<T>::max(){
     if (!head) {
         throw std::out_of_range("List is empty");
     }
@@ -306,7 +341,7 @@ typename FrankList<T>::reference FrankList<T>::max(){
 
 //operator = (copy)
 template <typename T>
-const FrankList<value_type>& FrankList<T>::operator=(const FrankList<value_type>& rhv){
+const vhuk::FrankList<T>& vhuk::FrankList<T>::operator=(const FrankList<value_type>& rhv){
 
 	if(this == &rhv){
 		return *this;
@@ -322,7 +357,7 @@ const FrankList<value_type>& FrankList<T>::operator=(const FrankList<value_type>
 
 //operator = (accign)
 template <typename T>
-const FrankList<value_type>& FrankList<T>::operator=(FrankList<value_type>&& rhv){
+const vhuk::FrankList<T>& vhuk::FrankList<T>::operator=(FrankList<value_type>&& rhv){
 	if(this == &rhv){
 		return *this;
 	}
@@ -343,7 +378,7 @@ const FrankList<value_type>& FrankList<T>::operator=(FrankList<value_type>&& rhv
 
 //operator = (initial)
 template <typename T>
-const FrankList<value_type>& FrankList<T>::operator=(std::initializer_list<value_type> init) {
+const vhuk::FrankList<T>& vhuk::FrankList<T>::operator=(std::initializer_list<value_type> init) {
 
 	this->clear();
 
@@ -357,7 +392,7 @@ const FrankList<value_type>& FrankList<T>::operator=(std::initializer_list<value
 
 //operator ==
 template <typename T>
-bool FrankList<T>::operator==(const FrankList<value_type>& rhv) const{
+bool vhuk::FrankList<T>::operator==(const FrankList<value_type>& rhv) const{
 	if(this->size() != rhv.size()){
 		return false;
 	}
@@ -377,13 +412,13 @@ bool FrankList<T>::operator==(const FrankList<value_type>& rhv) const{
 
 //operator !=
 template <typename T>
-bool FrankList<T>::operator!=(const FrankList<value_type>& rhv) const {
+bool vhuk::FrankList<T>::operator!=(const FrankList<value_type>& rhv) const {
 	return !(*this == rhv);
 }
 
 //operator <
 template <typename T>
-bool FrankList<T>::operator<(const FrankList<value_type>& rhv) const template <typename T>
+bool vhuk::FrankList<T>::operator<(const FrankList<value_type>& rhv) const
 {
 	auto it1 = this->begin();
 	auto it2 = rhv.begin();
@@ -402,216 +437,219 @@ bool FrankList<T>::operator<(const FrankList<value_type>& rhv) const template <t
 
 //operator <=
 template <typename T>
-bool operator<=(const FrankList<value_type>& rhv) const{
+bool vhuk::FrankList<T>::operator<=(const FrankList<value_type>& rhv) const{
 	return (*this < rhv) || (*this == rhv);
 }
 
 //operator >=
 template <typename T>
-bool FrankList<T>::operator>=(const FrankList<value_type>& rhv) const{
+bool vhuk::FrankList<T>::operator>=(const FrankList<value_type>& rhv) const{
 	return !(*this < rhv);
 }
 
 //operator >
 template <typename T>
-bool FrankList<T>::operator>(const FrankList<value_type>& rhv) const{
+bool vhuk::FrankList<T>::operator>(const FrankList<value_type>& rhv) const{
 	return !(*this <= rhv); 
 }
 
 
 // iterator cbegin
 template <typename T>
-typename FrankList<T>::const_iterator FrankList<T>::cbegin() const{
+typename vhuk::FrankList<T>::const_iterator vhuk::FrankList<T>::cbegin() const{
 	return const_iterator(head);
 }
 
 //iterator cend
 template <typename T>
-typename FrankList<T>::const_iterator FrankList<T>::cend() const{
+typename vhuk::FrankList<T>::const_iterator vhuk::FrankList<T>::cend() const{
 	return const_iterator(nullptr);
 }
 
 // reverse iterator crbegin
 template <typename T>
-typename FrankList<T>::const_reverse_iterator FrankList<T>::crbegin() const{
+typename vhuk::FrankList<T>::const_reverse_iterator vhuk::FrankList<T>::crbegin() const{
 	 return const_reverse_iterator(tail);
 }
 
 // reverse iterator crend
 template <typename T>
-typename FrankList<T>::const_reverse_iterator FrankList<T>::crend() const {
+typename vhuk::FrankList<T>::const_reverse_iterator vhuk::FrankList<T>::crend() const {
     return const_reverse_iterator(head->prev);
 }
 
 // cabegin
 template <typename T>
-typename FrankList<T>::const_asc_iterator FrankList<T>::cabegin() const {
+typename vhuk::FrankList<T>::const_asc_iterator vhuk::FrankList<T>::cabegin() const {
     return const_asc_iterator(atail);
 }
 
 // caend
 template <typename T>
-typename FrankList<T>::const_asc_iterator FrankList<T>::caend() const {
+typename vhuk::FrankList<T>::const_asc_iterator vhuk::FrankList<T>::caend() const {
     return const_asc_iterator(atail->asc);
 }
 
 // cdbegin
 template <typename T>
-typename FrankList<T>::const_desc_iterator FrankList<T>::cdbegin() const {
+typename vhuk::FrankList<T>::const_desc_iterator vhuk::FrankList<T>::cdbegin() const {
     return const_desc_iterator(atail);
 }
 
 // cdend
 template <typename T>
-typename FrankList<T>::const_desc_iterator FrankList<T>::cdend() const {
+typename vhuk::FrankList<T>::const_desc_iterator vhuk::FrankList<T>::cdend() const {
     return const_desc_iterator(ahead->desc);
 }
 
 
 //cmbegin
 template <typename T>
-typename FrankList<T>::const_multi_iterator cmbegin() const{
+typename vhuk::FrankList<T>::const_multi_iterator vhuk::FrankList<T>::cmbegin() const{
 	return const_multi_iterator(this->head);
 }
 
 
 //cmend
 template <typename T>
-typename FrankList<T>::const_multi_iterator cmend() const{
+typename vhuk::FrankList<T>::const_multi_iterator vhuk::FrankList<T>::cmend() const{
 	return const_multi_iterator (this->tail->next);
 }
 
 
 //cmabegin
 template <typename T>
-typename FrankList<T>::const_multi_iterator cmabegin() const{
+typename vhuk::FrankList<T>::const_multi_iterator vhuk::FrankList<T>::cmabegin() const{
 	return const_multi_iterator(this->ahead);
 }
 
 
 //cmaend
 template <typename T>
-typename FrankList<T>::const_multi_iterator cmaend() const{
+typename vhuk::FrankList<T>::const_multi_iterator vhuk::FrankList<T>::cmaend() const{
 	return const_multi_iterator(this->atail->asc);
 }
 
 
 //revers const multi iterator
 template <typename T>
-typename FrankList<T>::const_multi_reverse_iterator cmrbegin() const{
+typename vhuk::FrankList<T>::const_multi_reverse_iterator vhuk::FrankList<T>::cmrbegin() const{
 	return const_multi_reverse_iterator(tail);
 }
 
 
 //cmrend
 template <typename T>
-typename FrankList<T>::const_multi_reverse_iterator cmrend() const{
+typename vhuk::FrankList<T>::const_multi_reverse_iterator vhuk::FrankList<T>::cmrend() const{
 	return const_multi_reverse_iterator(this->head->prev);
 }
 
 //cmrdbegin
 template <typename T>
-typename FrankList<T>::const_multi_reverse_iterator cmrdbegin() const{
+typename vhuk::FrankList<T>::const_multi_reverse_iterator vhuk::FrankList<T>::cmrdbegin() const{
 	return const_multi_reverse_iterator(this->atail);
 }
 
 //cmrdend
 template <typename T>
-typename FrankList<T>::const_multi_reverse_iterator cmrdend() const{
+typename vhuk::FrankList<T>::const_multi_reverse_iterator vhuk::FrankList<T>::cmrdend() const{
 	return const_multi_reverse_iterator(this->ahead->desc);
 }
 
 
 //iterator begin
 template <typename T>
-typename FrankList<T>::iterator begin(){
+typename vhuk::FrankList<T>::iterator vhuk::FrankList<T>::begin(){
 	return iterator(this->head);
 }
 
 //iterator end
 template <typename T>
-typename FrankList<T>::iterator end(){
+typename vhuk::FrankList<T>::iterator vhuk::FrankList<T>::end(){
 	return iterator(this->teal->next);
 }
 
 //revers iterator begin
 template <typename T>
-typename FrankList<T>::reverse_iterator rbegin();{
+typename vhuk::FrankList<T>::reverse_iterator vhuk::FrankList<T>::rbegin(){
 	return reverse_iterator(this->teal);
 }
 
 //revers iterator end
 template <typename T>
-typename FrankList<T>::reverse_iterator rend(){
+typename vhuk::FrankList<T>::reverse_iterator vhuk::FrankList<T>::rend(){
 	return revers_iterator(this->head->prev);
 }
 
 //asc iterator abegin
 template <typename T>
-typename FrankList<T>::asc_iterator abegin(){
+typename vhuk::FrankList<T>::asc_iterator vhuk::FrankList<T>::abegin(){
 	return asc_iterator(this->ahead);
 }
 
 //asc iter end
 template <typename T>
-typename FrankList<T>::asc_iterator aend(){
+typename vhuk::FrankList<T>::asc_iterator vhuk::FrankList<T>::aend(){
 	return asc_iterator(this->atail->asc);
 }
 
 //dbegin
 template <typename T>
-typename FrankList<T>::desc_iterator dbegin(){
+typename vhuk::FrankList<T>::desc_iterator vhuk::FrankList<T>::dbegin(){
 	return desc_iterator(this->atail);
 }
 
 //dend
 template <typename T>
-typename FrankList<T>::desc_iterator dend(){
+typename vhuk::FrankList<T>::desc_iterator vhuk::FrankList<T>::dend(){
 	return desc_iterator(this->ahead->desc);
 }
 
 //mbegin
 template <typename T>
-typename FrankList<T>::multi_iterator mbegin(){
+typename vhuk::FrankList<T>::multi_iterator vhuk::FrankList<T>::mbegin(){
 	return multi_iterator(this->head);
 }
 
 //mend
 template <typename T>
-typename FrankList<T>::multi_iterator mend(){
+typename vhuk::FrankList<T>::multi_iterator vhuk::FrankList<T>::mend(){
 	return multi_iterator(this->tail->next);
 }
 
 //revers mrbegin
 template <typename T>
-typename FrankList<T>::multi_reverse_iterator mrbegin(){
+typename vhuk::FrankList<T>::multi_reverse_iterator vhuk::FrankList<T>::mrbegin(){
 	return multi_reverse_iterator(this->tail);
 }
 
 //revers mrend
 template <typename T>
-typename FrankList::multi_reverse_iterator mrend();{
+typename vhuk::FrankList<T>::multi_reverse_iterator vhuk::FrankList<T>::mrend(){
 	return multi_reverse_iterator(this->head->prev);
 }
 
 
 //revers mrdbegin
 template <typename T>
-typename FrankList<T>::multi_reverse_iterator mrdbegin(){
+typename vhuk::FrankList<T>::multi_reverse_iterator vhuk::FrankList<T>::mrdbegin(){
 	return multi_reverse_iterator(this->atail);
 }
 
 //revers mrdbend
 template <typename T>
-typename FrankList<T>::multi_reverse_iterator mrdend(){
+typename vhuk::FrankList<T>::multi_reverse_iterator vhuk::FrankList<T>::mrdend(){
 	return multi_reverse_iterator(this->ahead->desc);
 }
 
+//iterator
+/*
 template <typename T>
 template <typename iter> 
-iter FrankList<T>::insert(iter pos, size_type size, const_reference val){
-
+iter vhuk::FrankList<T>::insert(iter pos, size_type size, const_reference val){
+	for()
 }
+
 template <typename T>
 template <typename T>
 template <typename T>
@@ -652,10 +690,10 @@ template <typename T>
 template <typename T>
 template <typename T>
 
-
+*/
  
 }
-//
 
-}
-#endif //_FRANKLIST_HPP__
+
+
+#endif //_FRANKLIST_CPP__
