@@ -5,7 +5,7 @@
 using namespace vhuk;
 
 int main(){
-	FrankList<int> ob;
+	FrankList<int> ob(5);
 	
 	std::cout << ob << std::endl;
 

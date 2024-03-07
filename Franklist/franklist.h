@@ -1,5 +1,5 @@
-#ifndef _FRANKLIST_H__
-#define _FRANKLIST_H__
+#ifndef _FRANKLIST_HPP__
+#define _FRANKLIST_HPP__
 
 #include <iostream>
 
@@ -430,4 +430,4 @@ private:
 
 
 
-#endif // _FRANKLIST_H__
+#endif // _FRANKLIST_HPP__

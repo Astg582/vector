@@ -2,8 +2,32 @@
 #define _FRANKLIST_CPP_
 
 #include "franklist.h"
+#include <cassert>
 
-namespace vhuk{
+
+//operator << out
+template <typename T>
+std::ostream& vhuk::operator<<(std::ostream& out, const FrankList<T>& rhv)
+{
+    out << "~[ ";
+    for (auto it = rhv.cbegin(); it != rhv.cend(); ++it) {
+        out << *it << " ";
+    }
+    out << " ]~";
+    return out;
+}
+
+//Node
+template <typename T>
+vhuk::FrankList<T>::Node::Node()
+	: val(T()), next(nullptr), prev(nullptr), asc(nullptr), desc(nullptr)
+{}
+//Node (val)
+template <typename T>
+vhuk::FrankList<T>::Node::Node(T val)
+    : val(val), next(nullptr), prev(nullptr), asc(nullptr), desc(nullptr)
+{}
+
 
 //Construcors Franclist
 template <typename T>
@@ -12,37 +36,6 @@ vhuk::FrankList<T>::FrankList() {
 	this->tail = nullptr;
 	this->ahead = nullptr;
 	this->htail = nullptr;	
-}
-
-
-template <typename T>
-vhuk::FrankList<T>::Node::Node()
-    : val(T())
-    , next(nullptr)
-    , prev(nullptr)
-    , asc(nullptr)
-    , desc(nullptr)
-{}
-
-template <typename T>
-vhuk::FrankList<T>::Node::Node(T val)
-    : val(val)
-    , next(nullptr)
-    , prev(nullptr)
-    , asc(nullptr)
-    , desc(nullptr)
-{}
-
-//operator << out
-template <typename T>
-std::ostream& vhuk::operator<<(std::ostream& out, const FrankList<T>& rhv)
-{
-    out << "[";
-    for (auto it = rhv.cbegin(); it != rhv.cend(); ++it) {
-        out << *it << " ";
-    }
-    out << "]";
-    return out;
 }
 
 
@@ -642,46 +635,454 @@ typename vhuk::FrankList<T>::multi_reverse_iterator vhuk::FrankList<T>::mrdend()
 	return multi_reverse_iterator(this->ahead->desc);
 }
 
-//iterator
-/*
+//iterator insert
+
 template <typename T>
 template <typename iter> 
 iter vhuk::FrankList<T>::insert(iter pos, size_type size, const_reference val){
-	for()
+	static_assert(std::is_base_of<base_iterator, iter>::value == true, "uncorrect iterator");
+    for (size_type i = 0; i < s; ++i) {
+        pos = insert(pos, val);
+    }
+	return pos;
 }
 
 template <typename T>
+template <typename iter>
+iter vhuk::FrankList<T>::insert(iter pos, std::initializer_list<value_type> init){
+	static_assert(std::is_base_of<base_iterator, iter>::value == true, "uncorrect iterator");
+	for(auto i : val){
+		pos = insert(pos,i);
+	}
+	return pos;
+}
+
 template <typename T>
+template <typename iter, typename input_iterator>
+iter vhuk::FrankList<T>::insert(iter pos, input_iterator f, input_iterator l){
+	static_assert(std::is_base_of<base_iterator, iter>::value == true, "uncorrect iterator");
+	for (auto i = f; i != l; i++)
+	{
+		pos = insert(pos, *i);
+	}
+	return pos;
+}
+
+
+//Erase
 template <typename T>
+template <typename iter>
+iter vhuk::FrankList<T>::erase(iter pos){
+	static_assert(std::is_base_of<base_iterator, iter>::value == true, "uncorrect iterator");
+    Node* tmp = pos.ptr;
+	iter it(pos);
+	++it;
+	if(pos.ptr == this->head) {
+		pop_front();
+		return it;
+	}
+	if(pos.ptr == this->tail){
+		pop_back();
+		return it;
+	}
+	if (tmp->prev){
+		tmp->prev->next = tmp->next;
+	} 
+	if (tmp->next){
+		tmp->next->prev = tmp->prev;
+	}
+	if (tmp->desc){
+		tmp->desc->asc = tmp->asc;
+	}
+	if (tmp->asc)
+	{
+		tmp->asc->desc = tmp->desc;
+	}
+	
+	delete pos.ptr;
+	return it;
+	
+}
 template <typename T>
+template <typename iter>
+iter vhuk::FrankList<T>::erase(iter f, iter l){
+	iter it(f);
+	while (it != l){
+		it = erase(it);
+	}
+	return tmp;
+}
+
 template <typename T>
+ vhuk::FrankList<T>::size_type vhuk::FrankList<T>::remove(const_reference val){
+	size_type tmp = 0;
+	iterator it = this->begin();
+	while (it != this->end()){
+		if (*it == val){
+			it = erase(it);
+			++tmp;
+		}else{
+			++it;
+		}
+		
+	}
+	return tmp;
+ }
+
 template <typename T>
+template <typename unary_predicate>
+vhuk::FrankList<T>::size_type vhuk::FrankList<T>::remove_if(unary_predicate func){
+	size_type tmp = 0;
+	iterator it = this->begin();
+	while (it != this->end())
+	{
+		if(func(*it)){
+			it = erase();
+			++tmp;
+		}
+		else{
+			++it;
+		}
+	}
+	return tmp;
+}
+
+//revers
 template <typename T>
+void vhuk::FrankList<T>::reverse(){
+	std::swap(this->head, this->tail);
+	Node* it = head;
+	while (it != nullptr){
+		std::swap(it->next, it->prev );
+		it = it->next;
+		
+	}
+}
+
+
+//sort
 template <typename T>
+void vhuk::FrankList<T>::sort(bool reversed = false){
+	if(!ahead){
+		return;
+	}
+	if(!reversed){
+		this->head = this->ahead;
+		this->tail = this->atail;
+		Node* it = ahead;
+		it->prev = nullptr;
+		while (it){
+			it->next = it->asc;
+			if(it->next){
+				it->next->prev = it;
+			}
+			it = it->next;
+		}	
+	} else {
+			this->head = this->atail;
+			this->tail = this->ahead;
+			Node* it = ahead;
+		it->prev = nullptr;
+		while (it){
+			it->next = it -> desc;
+			if(it->next){
+				it->next->prev = it;
+			}
+			it = it->next;
+		}	
+	}
+}
+
+//find
 template <typename T>
+typename vhuk::FrankList<T>::iterator vhuk::FrankList<T>::find(const_reference elem){
+	iterator it = this->begin();
+	while (it != this->end() && *it != elem){
+		++it;
+	}
+	organize_left(it.ptr);
+	return iterator(it);
+}
+
+//rfind
 template <typename T>
+typename vhuk::FrankList<T>::iterator vhuk::FrankList<T>::rfind(const_reference elem){
+	reverse_iterator it = rbegin();
+	while (it != rand() && *it != elem){
+		++it;
+	}
+	organize_right(it.ptr);
+	return iterator(it);
+}
+
+//traverse
 template <typename T>
+template <typename unary_predicate>
+void vhuk::FrankList<T>::traverse(unary_predicate func, bool sorted = false, bool reversed = false){
+	if(empty()){
+		return;
+	}
+	if (!sorted && !reversed)
+	{
+		for(auto it = begin(); it != end(); ++it){
+			func(*it);
+		}
+	} else if (!sorted){
+		for(auto it = rbegin(); it != rend(); ++it){
+			func(*it);
+		}
+	} else if (!reverse) {
+		for(auto it = abegin(); it != aend(); ++it){
+			func(*it);
+		}
+	} else{
+		for( auto it = dbegin(); it != dend(); ++it){
+			func(*it);
+		}
+	}
+}
+
+//print
 template <typename T>
+void vhuk::FrankList<T>::print(bool sorted = false, bool reversed = false){
+	if(empty()){
+		std::cout << "~[ ]~";
+		return;
+	}
+	std::cout << "~[ ";
+	if (!sorted && !reversed){
+		for (auto it = begin(); it != end(); ++it){
+			std::cout << *it << " ";
+		}	
+	} else if (!sorted ){
+		for (auto it = rbegin(); it != rand(); ++it){
+			std::cout << *it << " ";
+		}
+	} else if (!reversed){
+		for (auto it = abegin(); it != aand(); ++it){
+			std::cout << *it << " ";
+		}
+	} else {
+		for (auto it = dbegin(); it != dand(); ++it){
+			std::cout << *it << " ";
+		}
+	}
+	std::cout << " ]~";
+}
+
 template <typename T>
+void vhuk::FrankList<T>::put_in_sorted_order(Node* ptr){
+	assert(ptr !== nullptr);
+	if (!ahead){    // !ahead 
+		ahead = ptr;
+		atail = ptr;
+		return;
+	}
+	Node* it = ahead;
+	while (it->val <= ptr->val && it->asc){
+		it = it->asc;
+	}
+
+	//it < ptr
+	if (it->val < ptr->val){
+		ptr->asc = it->asc;
+		it->asc = ptr;
+		ptr->desc = it;
+		if (!ptr->asc){
+			atail = ptr;
+		}
+	} else (it->val >= ptr->val){  // it >= ptr
+		ptr->desc = it->desc;
+		if(it->desc) {
+			it->desc->asc = ptr;
+		}else{
+			ahead = ptr;
+		}
+		ptr->asc = it;
+		it->desc = ptr;
+	}
+	
+}
+
+//organize_left
 template <typename T>
+void vhuk::FrankList<T>::organize_left(Node* ptr){
+	if(empty() || ptr == head){ return; }
+		Node* prev = ptr->prev;
+		Node* next = ptr->next;
+		if (prev){
+			if(prev->prev){
+				prev->prev->next = ptr;
+			}
+			prev->prev = ptr;
+			prev->next = next;
+			ptr->next = prev;
+		}
+		if (next){
+			next->prev = prev;
+		}
+		if (prev == head){
+			head = ptr;
+		}
+		if (ptr == tail) {
+			tail = prev;
+		}	
+}
+
+
+//organize_right
 template <typename T>
+ void vhuk::FrankList<T>::organize_right(Node* ptr){
+	if(empty() || ptr == tail){ return; }
+	Node* prev = ptr->prev;
+	Node* next = ptr->next;
+	if (prev){
+		if(next->next){
+			next->next->next = ptr;
+		}
+		next->next = ptr;
+		next->prev = prev;
+		ptr->next = next;
+	}
+	if (prev){
+		prev->next = next;
+	}
+	if (next == tail){
+		tail = ptr;
+	}
+	if (ptr == tail) {
+		head = next;
+	}	
+ }
+
+
+//insert def
 template <typename T>
+template <typename iter>
+iter vhuk::FrankList<T>::insert_def(iter pos, const_reference val){
+	assert(pos.ptr != nullptr);
+    if (pos.ptr == this->head) {
+        push_front(val);
+    } else {
+        Node* tmp = new Node(val);
+        pos.ptr->prev->next = tmp;
+        tmp->prev = pos.ptr->prev;
+        pos.ptr->prev = tmp;
+        tmp->next = pos.ptr;
+        
+        put_in_sorted_order(tmp);
+    }
+    return pos;
+}
+
+
+//insert rev
 template <typename T>
+template <typename iter>
+iter vhuk::FrankList<T>::insert_rev(iter pos, const_reference val){
+	assert(pos.ptr != nullptr);
+    insert_def(pos, val);
+    ++pos;
+    return pos;
+}
+
+
+
+//   Base Iterator   // ------------------------------------------------------------------------------------------------------------
 template <typename T>
+vhuk::FrankList<T>::base_iterator::base_iterator(Node* ptr) : this->ptr(ptr)
+{}
+
+// ==
 template <typename T>
+bool vhuk::FrankList<T>::base_iterator::operator==(const base_iterator& rhv) const{
+	return(this->ptr == rhv.ptr);
+}
+
+//~base iterator
 template <typename T>
+vhuk::FrankList<T>::base_iterator::~base_iterator(){this->ptr = nullptr;}
+
+
+// !=
 template <typename T>
+bool vhuk::FrankList<T>::base_iterator::operator!=(const base_iterator& rhv) const {
+	return this->ptr != rhv.ptr;
+}
+
+
+//const iterator
 template <typename T>
+vhuk::FrankList<T>::const_iterator::const_iterator(const base_iterator& rhv): base_iterator(rhv){}
+
+// R value constructor (const)
 template <typename T>
+vhuk::FrankList<T>::const_iterator::const_iterator(base_iterator&& rhv) : base_iterator(rhv){
+	rhv.ptr = nullptr;
+}
+
+// = copy
 template <typename T>
+const vhuk::FrankList<T>::const_iterator& vhuk::FrankList<T>::const_iterator::operator=(const base_iterator& rhv) {
+	this->ptr = rhv.ptr;
+	return this;
+}
+
+// = muv
 template <typename T>
+ const vhuk::FrankList<T>::const_iterator& vhuk::FrankList<T>::const_iterator::operator=(base_iterator&& rhv) {
+	this->ptr = rhv.ptr;
+	rhv.ptr = nullptr;
+	return this;
+ }
+
+// * deRef
 template <typename T>
+ vhuk::FrankList<T>::const_reference vhuk::FrankList<T>::const_iterator::operator*() const {
+		return this->ptr->val;
+ }
+
+// -> 
 template <typename T>
+vhuk::FrankList<T>::const_pointer vhuk::FrankList<T>::const_iterator::operator->() const{
+	return this->ptr;
+}
+
+// ++ prefix
 template <typename T>
+const vhuk::FrankList<T>::const_iterator& vhuk::FrankList<T>::const_iterator::operator++(){
+	this->ptr = this->ptr->next;
+	return *this;
+}
+
+// postfix ++ 
 template <typename T>
+const vhuk::FrankList<T>::const_iterator vhuk::FrankList<T>::const_iterator::operator++(value_type) {
+	const_iterator tmp(*this);
+	++(*this);
+	return tmp;
+}
+
+// -- prefix 
 template <typename T>
+const vhuk::FrankList<T>::const_iterator& vhuk::FrankList<T>::const_iterator::operator--(){
+	this->ptr = this->ptr->next;
+	return *this; 
+}
+
+// postfix --
 template <typename T>
+const vhuk::FrankList<T>::const_iterator vhuk::FrankList<T>::const_iterator::operator--(value_type) {
+	const_iterator tmp = this;
+	--(*this);
+	return tmp;
+}
+
+
+// constructor
 template <typename T>
+vhuk::FrankList<T>::const_iterator::const_iterator(Node* ptr) : this->ptr(ptr){}
+
 template <typename T>
 template <typename T>
 template <typename T>
@@ -690,9 +1091,9 @@ template <typename T>
 template <typename T>
 template <typename T>
 
-*/
+
  
-}
+
 
 
 
