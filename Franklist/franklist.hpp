@@ -1,7 +1,8 @@
 #ifndef _FRANKLIST_HPP__
-#define _FRANKLIST_HPP__
+#define _FRANKLIST_HPP_
 
 #include <iostream>
+
 
 namespace vhuk {
 
@@ -9,12 +10,13 @@ template <typename T>
 class FrankList;
 
 template <typename T>
-std::ostream& operator<<(std::ostream& out, const FrankList<T>& rhv);
+ std::ostream& operator<<(std::ostream& out, const FrankList<T>& rhv);
 
 template <typename T>
 class FrankList
 {
 public:
+   
     using value_type = T;
     using reference = value_type&;
     using const_reference = const value_type&;
@@ -46,6 +48,7 @@ private:
         Node* ptr = nullptr;
     };
 public:
+   
     class const_iterator : public base_iterator
     {
         friend FrankList<value_type>;
@@ -424,10 +427,9 @@ private:
     Node* atail;
 };
 
-
+ extern template class FrankList<int>;
 
 }
 
 
-
-#endif // _FRANKLIST_HPP__
+#endif //_FRANKLIST_HPP_
