@@ -1,13 +1,14 @@
-#ifndef _FRANKLIST_CPP__
-#define _FRANKLIST_CPP_
+#include "franklist.h"
+#ifndef FRANKLIST_CPP
+#define FRANKLIST_CPP
 
 #include <iostream>
-#include "franklist.hpp"
+//#include "franklist.h"
 #include <stdexcept>
 #include <cassert>
 
-namespace vhuk
-{
+//namespace vhuk
+//{
 	
 
 
@@ -16,7 +17,7 @@ template <typename T>
 std::ostream& vhuk::operator<<(std::ostream& out, const FrankList<T>& rhv)
 {
     out << "~[ ";
-    for (auto it = rhv.begin(); it != rhv.end(); ++it) {
+    for (auto it = rhv.cbegin(); it != rhv.cend(); ++it) {
         out << *it << " ";
     }
     out << " ]~";
@@ -45,12 +46,7 @@ vhuk::FrankList<T>::Node::Node(T val)
 
 //Construcors Franclist
 template <typename T>
-vhuk::FrankList<T>::FrankList() {
-	this->head = nullptr;
-	this->tail = nullptr;
-	this->ahead = nullptr;
-	this->htail = nullptr;	
-}
+vhuk::FrankList<T>::FrankList() : head(nullptr), tail(nullptr), ahead(nullptr), atail(nullptr){}
 
 
 
@@ -62,7 +58,7 @@ vhuk::FrankList<T>::FrankList(size_type size) : vhuk::FrankList<T>::FrankList() 
 }
 
 template <typename T>
-vhuk::FrankList<T>::FrankList(size_type size, const_reference init) : vhuk::FrankList<T>::FrancList() {
+vhuk::FrankList<T>::FrankList(size_type size, const_reference init) : vhuk::FrankList<T>::FrankList() {
 
 	for(int i = 0; i != size; ++i){
 		push_back (init);
@@ -70,7 +66,7 @@ vhuk::FrankList<T>::FrankList(size_type size, const_reference init) : vhuk::Fran
 }
 
 template <typename T>
-vhuk::FrankList<T>::FrankList(const FrankList<value_type>& rhv) : vhuk::FrankList<T>::FrancList() 
+vhuk::FrankList<T>::FrankList(const FrankList<value_type>& rhv) : vhuk::FrankList<T>::FrankList() 
 {
 	for(auto it = rhv.begin(); it != rhv.end(); ++it){
 		push_back(*it);
@@ -93,15 +89,15 @@ vhuk::FrankList<T>::FrankList(FrankList<value_type>&& rhv)
 }
 
 template <typename T>
-vhuk::FrankList<T>::FrankList(std::initializer_list<value_type> init) : vhuk::FrankList<T>::FrancList() {
+vhuk::FrankList<T>::FrankList(std::initializer_list<value_type> init) : vhuk::FrankList<T>::FrankList() {
 	for(const auto& i : init){
-		push_back(i);
+		push_front(i);
 	}
 }
 
 template <typename T>
 template <typename input_iterator>
-vhuk::FrankList<T>::FrankList(input_iterator f, input_iterator l) : vhuk::FrankList<T>::FrancList()
+vhuk::FrankList<T>::FrankList(input_iterator f, input_iterator l) : vhuk::FrankList<T>::FrankList()
 {
 	for(input_iterator it = f; it != l; ++it){
 		push_back(*it);
@@ -114,10 +110,10 @@ vhuk::FrankList<T>::FrankList(input_iterator f, input_iterator l) : vhuk::FrankL
 template <typename T>
 void vhuk::FrankList<T>::swap(FrankList<value_type>& rhv)
 {
-	std::swap(this->head = rhv.head);
-	std::swap(this->tail = rhv.tail);
-	std::swap(this->ahead = rhv.ahead);
-	std::swap(this->atail = rhv.atail);
+	std::swap(this->head, rhv.head);
+	std::swap(this->tail, rhv.tail);
+	std::swap(this->ahead, rhv.ahead);
+	std::swap(this->atail, rhv.atail);
 }
 
 //SIZE
@@ -165,7 +161,7 @@ template <typename T>
 void vhuk::FrankList<T>::clear() noexcept{
 	Node* tmp = head;
 
-	while(tmp)
+	while(tmp != nullptr)
 	{	Node* next = tmp->next;
 		delete tmp;
 		tmp =  next;
@@ -1023,11 +1019,11 @@ bool vhuk::FrankList<T>::base_iterator::operator!=(const base_iterator& rhv) con
 
 //const iterator
 template <typename T>
-vhuk::FrankList<T>::const_iterator::const_iterator(const base_iterator& rhv): base_iterator(rhv){}
+vhuk::FrankList<T>::const_iterator::const_iterator(const base_iterator& rhv): base_iterator(rhv.ptr){}
 
 // R value constructor (const)
 template <typename T>
-vhuk::FrankList<T>::const_iterator::const_iterator(base_iterator&& rhv) : base_iterator(rhv){
+vhuk::FrankList<T>::const_iterator::const_iterator(base_iterator&& rhv) : base_iterator(rhv.ptr){
 	rhv.ptr = nullptr;
 }
 
@@ -1067,7 +1063,7 @@ const typename vhuk::FrankList<T>::const_iterator& vhuk::FrankList<T>::const_ite
 
 // postfix ++ 
 template <typename T>
-const  typename vhuk::FrankList<T>::const_iterator vhuk::FrankList<T>::const_iterator::operator++(value_type) {
+const  typename vhuk::FrankList<T>::const_iterator vhuk::FrankList<T>::const_iterator::operator++(int) {
 	const_iterator tmp(*this);
 	++(*this);
 	return tmp;
@@ -1082,7 +1078,7 @@ const typename vhuk::FrankList<T>::const_iterator& vhuk::FrankList<T>::const_ite
 
 // postfix --
 template <typename T>
-const typename vhuk::FrankList<T>::const_iterator vhuk::FrankList<T>::const_iterator::operator--(value_type) {
+const typename vhuk::FrankList<T>::const_iterator vhuk::FrankList<T>::const_iterator::operator--(int) {
 	const_iterator tmp = this;
 	--(*this);
 	return tmp;
@@ -1091,23 +1087,24 @@ const typename vhuk::FrankList<T>::const_iterator vhuk::FrankList<T>::const_iter
 
 // constructor
 template <typename T>
-vhuk::FrankList<T>::const_iterator::const_iterator(Node* ptr) : base_iterator(){}
+vhuk::FrankList<T>::const_iterator::const_iterator(Node* ptr) : base_iterator(ptr){}
 
 template <typename T>
-vhuk::FrankList<T>::terator::iterator(const base_iterator& rhv) : const_iterator() {}
+vhuk::FrankList<T>::iterator::iterator(const base_iterator& rhv) : const_iterator(rhv.ptr) {}
 
-template <typename T>
-vhuk::FrankList<T>::terator::iterator(base_iterator&& rhv);
-template <typename T>
-template <typename T>
-template <typename T>
+//template <typename T>
+//vhuk::FrankList<T>::terator::iterator(base_iterator&& rhv){}
+/*
 template <typename T>
 template <typename T>
-
+template <typename T>
+template <typename T>
+template <typename T>
+*/
 
  
 
 
-} // namespace vhuk
+//} // namespace vhuk
 
 #endif //_FRANKLIST_CPP_
