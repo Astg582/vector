@@ -1007,13 +1007,18 @@ bool vhuk::FrankList<T>::base_iterator::operator==(const base_iterator& rhv) con
 
 //~base iterator
 template <typename T>
-vhuk::FrankList<T>::base_iterator::~base_iterator(){this->ptr = nullptr;}
+vhuk::FrankList<T>::base_iterator::~base_iterator()
+{
+    ptr = nullptr;
+}
+
+
 
 
 // !=
 template <typename T>
 bool vhuk::FrankList<T>::base_iterator::operator!=(const base_iterator& rhv) const {
-	return this->ptr != rhv.ptr;
+	return ptr != rhv.ptr;
 }
 
 
@@ -1024,14 +1029,20 @@ vhuk::FrankList<T>::const_iterator::const_iterator(const base_iterator& rhv): ba
 // R value constructor (const)
 template <typename T>
 vhuk::FrankList<T>::const_iterator::const_iterator(base_iterator&& rhv) : base_iterator(rhv.ptr){
+	if(rhv.ptr == this->ptr){
+		return ;
+	}
 	rhv.ptr = nullptr;
 }
 
 // = copy
 template <typename T>
 const typename vhuk::FrankList<T>::const_iterator& vhuk::FrankList<T>::const_iterator::operator=(const base_iterator& rhv) {
+	if(rhv.ptr == this->ptr){
+		return this;
+	}
 	this->ptr = rhv.ptr;
-	return this;
+	return *this;
 }
 
 // = muv
@@ -1039,7 +1050,7 @@ template <typename T>
  const typename vhuk::FrankList<T>::const_iterator& vhuk::FrankList<T>::const_iterator::operator=(base_iterator&& rhv) {
 	this->ptr = rhv.ptr;
 	rhv.ptr = nullptr;
-	return this;
+	return *this;
  }
 
 // * deRef
@@ -1072,7 +1083,7 @@ const  typename vhuk::FrankList<T>::const_iterator vhuk::FrankList<T>::const_ite
 // -- prefix 
 template <typename T>
 const typename vhuk::FrankList<T>::const_iterator& vhuk::FrankList<T>::const_iterator::operator--(){
-	this->ptr = this->ptr->next;
+	this->ptr = this->ptr->prev;
 	return *this; 
 }
 
@@ -1085,24 +1096,682 @@ const typename vhuk::FrankList<T>::const_iterator vhuk::FrankList<T>::const_iter
 }
 
 
-// constructor
 template <typename T>
 vhuk::FrankList<T>::const_iterator::const_iterator(Node* ptr) : base_iterator(ptr){}
 
+
+// iterator
 template <typename T>
 vhuk::FrankList<T>::iterator::iterator(const base_iterator& rhv) : const_iterator(rhv.ptr) {}
 
-//template <typename T>
-//vhuk::FrankList<T>::terator::iterator(base_iterator&& rhv){}
-/*
 template <typename T>
-template <typename T>
-template <typename T>
-template <typename T>
-template <typename T>
-*/
+const typename vhuk::FrankList<T>::iterator& vhuk::FrankList<T>::iterator::operator=(const base_iterator& rhv) {
+    const_iterator::operator=(rhv.ptr);
+    return *this;
+}
 
- 
+
+// muv assign
+template <typename T>
+const typename vhuk::FrankList<T>::iterator::iterator& vhuk::FrankList<T>::iterator::operator=(base_iterator&& rhv){
+	const_iterator::operator=(rhv.ptr);
+	rhv.ptr = nullptr;
+	return *this;
+}
+
+template <typename T>
+typename vhuk::FrankList<T>::reference vhuk::FrankList<T>::iterator::operator*(){
+	return this->val;
+}
+
+template <typename T>
+typename vhuk::FrankList<T>::pointer vhuk::FrankList<T>::iterator::operator->(){
+	return this->ptr;
+}
+
+
+//const revers iterator
+template <typename T>
+vhuk::FrankList<T>::const_reverse_iterator::const_reverse_iterator(const base_iterator& rhv) : base_iterator(rhv.ptr){}
+
+
+template <typename T>
+vhuk::FrankList<T>::const_reverse_iterator::const_reverse_iterator(base_iterator&& rhv): base_iterator(rhv.ptr) { 
+	rhv.ptr = nullptr;
+}
+
+template <typename T>
+const typename vhuk::FrankList<T>::const_reverse_iterator& vhuk::FrankList<T>::const_reverse_iterator::operator=(const base_iterator& rhv){
+	base_iterator::operator=(rhv.ptr);
+	return this;
+}
+
+
+template <typename T>
+const typename vhuk::FrankList<T>::const_reverse_iterator& vhuk::FrankList<T>::const_reverse_iterator::operator=(base_iterator&& rhv){
+	base_iterator::operator=(rhv.ptr);
+	rhv.ptr = nullptr;
+	return *this;
+}
+
+
+
+template <typename T>
+typename vhuk::FrankList<T>::const_reference vhuk::FrankList<T>::const_reverse_iterator::operator*() const {
+	return this->val;
+}
+
+template <typename T>
+typename vhuk::FrankList<T>::const_pointer vhuk::FrankList<T>::const_reverse_iterator::operator->() const {
+	return this->ptr;
+}
+
+
+template <typename T>
+typename vhuk:: typename FrankList<T>::const_reverse_iterator& vhuk::FrankList<T>::const_reverse_iterator::operator++() {
+    --(*this); 
+    return *this;
+}
+
+
+template <typename T>
+typename vhuk::FrankList<T>::const_reverse_iterator vhuk::FrankList<T>::const_reverse_iterator::operator++(int) {
+    const_reverse_iterator tmp = *this;
+    --(*this); 
+    return tmp;
+}
+
+
+
+template <typename T>
+const  typename vhuk::FrankList<T>::const_reverse_iterator& vhuk::FrankList<T>::const_reverse_iterator::operator--(){
+	this->ptr = this->ptr->next;
+	return *this; 
+}
+
+template <typename T>
+const  typename vhuk::FrankList<T>::const_reverse_iterator vhuk::FrankList<T>::const_reverse_iterator::operator--(){
+	base_iterator tmp = this;
+	this->ptr = this->ptr->next;
+	return *tmp; 
+}
+
+template <typename T>
+vhuk::FrankList<T>::const_reverse_iterator::const_reverse_iterator(Node* ptr): base_iterator(ptr){}
+
+//revers iterator
+template <typename T>
+vhuk::FrankList<T>::reverse_iterator::reverse_iterator(const base_iterator& rhv) : const_reverse_iterator(rhv.ptr){}
+
+
+template <typename T>
+vhuk::FrankList<T>::reverse_iterator::reverse_iterator(base_iterator&& rhv) : const_reverse_iterator(rhv.ptr){
+	rhv.ptr = nullptr;
+}
+
+
+template <typename T>
+typename vhuk::FrankList<T>::reference vhuk::FrankList<T>::reverse_iterator::operator*(){
+	return this->ptr->val;
+}
+
+template <typename T>
+typename vhuk::FrankList<T>::pointer vhuk::FrankList<T>::reverse_iterator::operator->(){
+	return this->ptr;
+}
+
+template <typename T>
+const typename vhuk::FrankList<T>::reverse_iterator::reverse_iterator& vhuk::FrankList<T>::reverse_iterator::operator=(const base_iterator& rhv): const_revers_iterator(rhv.ptr){
+	return *this;
+} 
+
+template <typename T>
+const typename vhuk::FrankList<T>::reverse_iterator::reverse_iterator& vhuk::FrankList<T>::reverse_iterator::operator=(base_iterator&& rhv): const_reverse_iterator(rhv.ptr){
+	
+	rhv.ptr = nullptr;
+	return *this;
+}
+
+template <typename T>
+vhuk::FrankList<T>::reverse_iterator::reverse_iterator(Node* ptr)const_reverse_iterator(ptr){}
+
+
+// const asc iterator
+template <typename T>
+vhuk::FrankList<T>::const_asc_iterator::const_asc_iterator(const base_iterator& rhv):base_iterator(rhv.ptr){}
+
+
+template <typename T>
+vhuk::FrankList<T>::const_asc_iterator::const_asc_iterator(base_iterator&& rhv):base_iterator(rhv.ptr){
+	rhv.ptr = nullptr;
+}
+
+template <typename T>
+const typename vhuk::FrankList<T>::const_asc_iterator& vhuk::FrankList<T>::const_asc_iterator::operator=(const base_iterator& rhv): base_iterator(rhv.ptr){
+	return *this;
+}
+
+
+template <typename T>
+const typename vhuk::FrankList<T>::const_asc_iterator& vhuk::FrankList<T>::const_asc_iterator::operator=(base_iterator&& rhv): base_iterator(rhv.ptr){
+	rhv.ptr = nullptr;
+	return *this;
+}
+
+template <typename T>
+typename vhuk::FrankList<T>::const_reference vhuk::FrankList<T>::const_asc_iterator::operator*() const{
+	return this->val;
+}
+
+
+template <typename T>
+typename vhuk::FrankList<T>::const_pointer vhuk::FrankList<T>::const_asc_iterator::operator->() const {
+	return this->ptr;
+}
+
+
+
+template <typename T>
+const typename vhuk::FrankList<T>::const_asc_iterator& vhuk::FrankList<T>::const_asc_iterator::operator++(){
+	this->ptr = this->ptr->asc;
+	return *this;
+}
+
+template <typename T>
+const typename vhuk::FrankList<T>::const_asc_iterator vhuk::FrankList<T>::const_asc_iterator::operator++(int){
+	base_iterator tmp = this->ptr;
+	this->ptr = this->ptr->asc;
+	return tmp;
+}
+
+template <typename T>
+const typename vhuk::FrankList<T>::const_asc_iterator& vhuk::FrankList<T>::const_asc_iterator::operator--(){
+	this->ptr = this->ptr->desc;
+	return *this;
+}
+
+template <typename T>
+const typename vhuk::FrankList<T>::const_asc_iterator vhuk::FrankList<T>::const_asc_iterator::operator--(int){
+	base_iterator tmp = this->ptr;
+	this->ptr = this->ptr->desc;
+	return tmp;
+}
+
+
+template <typename T>
+vhuk::FrankList<T>::const_asc_iterato::const_asc_iterator(Node* ptr): base_iterator(ptr){}
+
+//asc iterator
+template <typename T>
+vhuk::FrankList<T>::asc_iterato::asc_iterator(const base_iterator& rhv): const_asc_iterator(rhv.ptr){}
+
+
+template <typename T>
+vhuk::FrankList<T>::asc_iterato::asc_iterator(base_iterator&& rhv) : const_asc_iterator(rhv.ptr){
+	rhv.ptr = nullptr;
+}
+
+template <typename T>
+const typename  vhuk::FrankList<T>::asc_iterator& vhuk::FrankList<T>::asc_iterator::operator=(const base_iterator& rhv): const_asc_iterator(rhv.ptr){
+	return *this;
+}
+
+template <typename T>
+const typename  vhuk::FrankList<T>::asc_iterator& vhuk::FrankList<T>::asc_iterator::operator=(base_iterator&& rhv): const_asc_iterator(rhv.ptr){
+	rhv.ptr = nullptr;
+	return *this;
+}
+
+
+template <typename T>
+typename  vhuk::FrankList<T>::reference vhuk::FrankList<T>::asc_iterator::operator*(){
+	return this->val;
+}
+
+template <typename T>
+typename  vhuk::FrankList<T>pointer vhuk::FrankList<T>::asc_iterator::operator->(){
+	return this->ptr;
+}
+
+
+template <typename T>
+vhuk::FrankList<T>::asc_iterator::asc_iterator(Node* ptr) : base_iterator(ptr){}
+
+
+//const desc
+template <typename T>
+vhuk::FrankList<T>::const_desc_iterator::const_desc_iterator(const base_iterator& rhv):base_iterator(rhv.ptr){}
+
+
+template <typename T>
+vhuk::FrankList<T>::const_asc_iterator::const_desc_iterator(base_iterator&& rhv):base_iterator(rhv.ptr){
+	rhv.ptr = nullptr;
+}
+
+template <typename T>
+const typename vhuk::FrankList<T>::const_desc_iterator& vhuk::FrankList<T>::const_desc_iterator::operator=(const base_iterator& rhv):base_iterator(rhv.ptr){
+	return *this;
+}
+
+
+template <typename T>
+const typename vhuk::FrankList<T>::const_desc_iterator& vhuk::FrankList<T>::const_desc_iterator::operator=(base_iterator&& rhv):base_iterator(rhv.ptr){
+	rhv.ptr = nullptr;
+	return *this;
+}
+
+template <typename T>
+typename vhuk::FrankList<T>::const_reference vhuk::FrankList<T>::const_desc_iterator::operator*() const{
+	return this->val;
+}
+
+
+template <typename T>
+typename vhuk::FrankList<T>::const_pointer vhuk::FrankList<T>::const_desc_iterator::operator->() const {
+	return this->ptr;
+}
+
+
+
+template <typename T>
+const typename vhuk::FrankList<T>::const_desc_iterator& vhuk::FrankList<T>::const_desc_iterator::operator++(){
+	this->ptr = this->ptr->desc;
+	return *this;
+}
+
+template <typename T>
+const typename vhuk::FrankList<T>::const_desc_iterator vhuk::FrankList<T>::const_desc_iterator::operator++(int){
+	base_iterator tmp = this->ptr;
+	this->ptr = this->ptr->desc;
+	return tmp;
+}
+
+template <typename T>
+const typename vhuk::FrankList<T>::const_desc_iterator& vhuk::FrankList<T>::const_desc_iterator::operator--(){
+	this->ptr = this->ptr->asc;
+	return *this;
+}
+
+template <typename T>
+const typename vhuk::FrankList<T>::const_desc_iterator vhuk::FrankList<T>::const_desc_iterator::operator--(int){
+	base_iterator tmp = this->ptr;
+	this->ptr = this->ptr->asc;
+	return tmp;
+}
+
+
+template <typename T>
+vhuk::FrankList<T>::const_desc_iterato::const_desc_iterator(Node* ptr): base_iterator(ptr){}
+
+//desc iterator
+template <typename T>
+vhuk::FrankList<T>::desc_iterato::desc_iterator(const base_iterator& rhv): const_desc_iterator(rhv.ptr){}
+
+
+template <typename T>
+vhuk::FrankList<T>::desc_iterato::desc_iterator(base_iterator&& rhv) : const_desc_iterator(rhv.ptr){
+	rhv.ptr = nullptr;
+}
+
+template <typename T>
+const typename  vhuk::FrankList<T>::desc_iterator& vhuk::FrankList<T>::desc_iterator::operator=(const base_iterator& rhv): const_desc_iterator(rhv.ptr){
+	return *this;
+}
+
+template <typename T>
+const typename  vhuk::FrankList<T>::desc_iterator& vhuk::FrankList<T>::desc_iterator::operator=(base_iterator&& rhv): const_desc_iterator(rhv.ptr){
+	rhv.ptr = nullptr;
+	return *this;
+}
+
+
+template <typename T>
+typename  vhuk::FrankList<T>::reference vhuk::FrankList<T>::desc_iterator::operator*(){
+	return this->val;
+}
+
+template <typename T>
+typename  vhuk::FrankList<T>pointer vhuk::FrankList<T>::desc_iterator::operator->(){
+	return this->ptr;
+}
+
+
+template <typename T>
+vhuk::FrankList<T>::desc_iterator::desc_iterator(Node* ptr) : base_iterator(ptr){}
+
+
+//multi const iterator
+template <typename T>
+vhuk::FrankList<T>::const_multi_iterator::const_multi_iterator(const base_iterator& rhv) :base_iterator(rhv.ptr){}
+
+template <typename T>
+vhuk::FrankList<T>::const_multi_iterator::const_multi_iterator(base_iterator&& rhv) :base_iterator(rhv.ptr){
+	rhv.ptr = nullptr;
+}
+
+template <typename T>
+const typename  vhuk::FrankList<T>::const_multi_iterator& vhuk::FrankList<T>::const_multi_iterator::operator=(const base_iterator& rhv):base_iterator(rhv.ptr){}
+
+template <typename T>
+const typename  vhuk::FrankList<T>::const_multi_iterator& vhuk::FrankList<T>::const_multi_iterator::operator=(base_iterator&& rhv):base_iterator(rhv.ptr){
+	rhv.ptr = nullptr;
+}
+
+
+template <typename T>
+typename  vhuk::FrankList<T>::const_reference vhuk::FrankList<T>::const_multi_iterator::operator*() const{
+	return this->val;
+}
+
+template <typename T>
+typename  vhuk::FrankList<T>::const_pointer vhuk::FrankList<T>::const_multi_iterat::operator->() const{
+	return this->ptr;
+}
+
+
+template <typename T>
+const typename vhuk::FrankList<T>::const_multi_iterator& vhuk::FrankList<T>::const_multi_iterat::operator++(){
+if (mode) {
+        this->ptr = this->ptr->next;
+    }
+    else {
+        this->ptr = this->ptr->asc;
+    }
+    return *this;
+}
+
+
+
+template <typename T>
+const typename vhuk::FrankList<T>::const_multi_iterator& vhuk::FrankList<T>::const_multi_iterat::operator++(int){
+	base_iterator tmp = this;
+	if (mode) {
+        	this->ptr = this->ptr->next;
+    	}
+    	else {
+        	this->ptr = this->ptr->asc;
+    	}
+    	return tmp;
+}
+
+template <typename T>
+const typename vhuk::FrankList<T>::const_multi_iterator& vhuk::FrankList<T>::const_multi_iterat::operator--(){
+if (mode) {
+        this->ptr = this->ptr->prev;
+    }
+    else {
+        this->ptr = this->ptr->desc;
+    }
+    return *this;
+}
+
+
+
+template <typename T>
+const typename vhuk::FrankList<T>::const_multi_iterator vhuk::FrankList<T>::const_multi_iterat::operator--(int){
+	base_iterator tmp = this;
+	if (mode) {
+        	this->ptr = this->ptr->prev;
+    	}
+    	else {
+        	this->ptr = this->ptr->desc;
+    	}
+    	return tmp;
+}
+
+
+template <typename T>
+vhuk::FrankList<T>::const_multi_iterator::const_multi_iterator(Node* ptr):base_iterator(ptr){}
+
+//multi iterator
+template <typename T>
+vhuk::FrankList<T>::multi_iterator::multi_iterator(const base_iterator& rhv) :const_multi_iterator(rhv.ptr){}
+
+template <typename T>
+vhuk::FrankList<T>::multi_iterator::multi_iterator(base_iterator&& rhv) : const_multi_iterator(rhv.ptr){
+	rhv.ptr = nullptr;
+}
+
+template <typename T>
+const typename  vhuk::FrankList<T>::multi_iterator& vhuk::FrankList<T>::multi_iterator::operator=(const base_iterator& rhv):const_multi_iterator(rhv.ptr){}
+
+template <typename T>
+const typename  vhuk::FrankList<T>::multi_iterator& vhuk::FrankList<T>::multi_iterator::operator=(base_iterator&& rhv): const_multi_iterator(rhv.ptr){
+	rhv.ptr = nullptr;
+}
+
+
+template <typename T>
+typename  vhuk::FrankList<T>::reference vhuk::FrankList<T>::multi_iterator::operator*() const{
+	return this->val;
+}
+
+template <typename T>
+typename  vhuk::FrankList<T>::pointer vhuk::FrankList<T>::multi_iterat::operator->() const{
+	return this->ptr;
+}
+
+
+template <typename T>
+const typename vhuk::FrankList<T>::multi_iterator& vhuk::FrankList<T>::multi_iterat::operator++(){
+if (mode) {
+        this->ptr = this->ptr->next;
+    }
+    else {
+        this->ptr = this->ptr->asc;
+    }
+    return *this;
+}
+
+
+
+template <typename T>
+const typename vhuk::FrankList<T>::multi_iterator& vhuk::FrankList<T>::multi_iterat::operator++(int){
+	base_iterator tmp = this;
+	if (mode) {
+        	this->ptr = this->ptr->next;
+    	}
+    	else {
+        	this->ptr = this->ptr->asc;
+    	}
+    	return tmp;
+}
+
+template <typename T>
+const typename vhuk::FrankList<T>::multi_iterator& vhuk::FrankList<T>::multi_iterat::operator--(){
+if (mode) {
+        this->ptr = this->ptr->prev;
+    }
+    else {
+        this->ptr = this->ptr->desc;
+    }
+    return *this;
+}
+
+
+
+template <typename T>
+const typename vhuk::FrankList<T>::multi_iterator& vhuk::FrankList<T>::multi_iterat::operator--(int){
+	base_iterator tmp = this;
+	if (mode) {
+        	this->ptr = this->ptr->prev;
+    	}
+    	else {
+        	this->ptr = this->ptr->desc;
+    	}
+    	return tmp;
+}
+
+
+template <typename T>
+vhuk::FrankList<T>::multi_iterator::const_multi_iterator(Node* ptr):base_iterator(ptr){}
+
+//const multi revers 
+template <typename T>
+vhuk::FrankList<T>::const_multi_revers_iterator::const_multi_revers_iterator(const base_iterator& rhv) :base_iterator(rhv.ptr){}
+
+template <typename T>
+vhuk::FrankList<T>::const_multi__revers_iterator::const_multi_revers_iterator(base_iterator&& rhv) :base_iterator(rhv.ptr){
+	rhv.ptr = nullptr;
+}
+
+template <typename T>
+const typename  vhuk::FrankList<T>::const_multi_revers_iterator& vhuk::FrankList<T>::const_multi_revers_iterator::operator=(const base_iterator& rhv):base_iterator(rhv.ptr){}
+
+template <typename T>
+const typename  vhuk::FrankList<T>::const_multi_revers_iterator& vhuk::FrankList<T>::const_multi_revers_iterator::operator=(base_iterator&& rhv):base_iterator(rhv.ptr){
+	rhv.ptr = nullptr;
+}
+
+
+template <typename T>
+typename  vhuk::FrankList<T>::const_reference vhuk::FrankList<T>::const_multi_revers_iterator::operator*() const{
+	return this->val;
+}
+
+template <typename T>
+typename  vhuk::FrankList<T>::const_pointer vhuk::FrankList<T>::const_multi_revers_iterat::operator->() const{
+	return this->ptr;
+}
+
+
+template <typename T>
+const typename vhuk::FrankList<T>::const_multi_revers_iterator& vhuk::FrankList<T>::const_multi_revers_iterat::operator++(){
+if (mode) {
+        this->ptr = this->ptr->prev;
+    }
+    else {
+        this->ptr = this->ptr->desc;
+    }
+    return *this;
+}
+
+
+
+template <typename T>
+const typename vhuk::FrankList<T>::const_multi_revers_iterator vhuk::FrankList<T>::const_multi_revers_iterat::operator++(int){
+	base_iterator tmp = this;
+	if (mode) {
+        	this->ptr = this->ptr->prev;
+    	}
+    	else {
+        	this->ptr = this->ptr->desc;
+    	}
+    	return tmp;
+}
+
+template <typename T>
+const typename vhuk::FrankList<T>::const_multi_revers_iterator& vhuk::FrankList<T>::const_multi_revers_iterat::operator--(){
+if (mode) {
+        this->ptr = this->ptr->next;
+    }
+    else {
+        this->ptr = this->ptr->asc;
+    }
+    return *this;
+}
+
+
+
+template <typename T>
+const typename vhuk::FrankList<T>::const_multi_revers_iterator vhuk::FrankList<T>::const_multi_revers_iterat::operator--(int){
+	base_iterator tmp = this;
+	if (mode) {
+        	this->ptr = this->ptr->next;
+    	}
+    	else {
+        	this->ptr = this->ptr->asc;
+    	}
+    	return tmp;
+}
+
+
+template <typename T>
+vhuk::FrankList<T>::const_multi_revers_iterator::const_multi_revers_iterator(Node* ptr):base_iterator(ptr){}
+
+//const multi revers 
+template <typename T>
+vhuk::FrankList<T>::multi_revers_iterator::multi_revers_iterator(const base_iterator& rhv) : const_multi_revers_iterator(rhv.ptr){}
+
+template <typename T>
+vhuk::FrankList<T>::multi__revers_iterator::multi_revers_iterator(base_iterator&& rhv) :const_multi_revers_iterator(rhv.ptr){
+	rhv.ptr = nullptr;
+}
+
+template <typename T>
+const typename  vhuk::FrankList<T>::multi_revers_iterator& vhuk::FrankList<T>::multi_revers_iterator::operator=(const base_iterator& rhv): const_multi_revers_iterator(rhv.ptr){}
+
+template <typename T>
+const typename  vhuk::FrankList<T>::multi_revers_iterator& vhuk::FrankList<T>::multi_revers_iterator::operator=(base_iterator&& rhv):const_multi_revers_iterator(rhv.ptr){
+	rhv.ptr = nullptr;
+}
+
+
+template <typename T>
+typename  vhuk::FrankList<T>::reference vhuk::FrankList<T>::multi_revers_iterator::operator*() const{
+	return this->val;
+}
+
+template <typename T>
+typename  vhuk::FrankList<T>::pointer vhuk::FrankList<T>::multi_revers_iterat::operator->() const{
+	return this->ptr;
+}
+
+
+template <typename T>
+const typename vhuk::FrankList<T>::multi_revers_iterator& vhuk::FrankList<T>::multi_revers_iterat::operator++(){
+if (mode) {
+        this->ptr = this->ptr->prev;
+    }
+    else {
+        this->ptr = this->ptr->desc;
+    }
+    return *this;
+}
+
+
+
+template <typename T>
+const typename vhuk::FrankList<T>::multi_revers_iterator& vhuk::FrankList<T>::multi_revers_iterat::operator++(int){
+	base_iterator tmp = this;
+	if (mode) {
+        	this->ptr = this->ptr->prev;
+    	}
+    	else {
+        	this->ptr = this->ptr->desc;
+    	}
+    	return tmp;
+}
+
+template <typename T>
+const typename vhuk::FrankList<T>::multi_revers_iterator vhuk::FrankList<T>::multi_revers_iterat::operator--(){
+if (mode) {
+        this->ptr = this->ptr->next;
+    }
+    else {
+        this->ptr = this->ptr->asc;
+    }
+    return *this;
+}
+
+
+
+template <typename T>
+const typename vhuk::FrankList<T>::multi_revers_iterator vhuk::FrankList<T>::multi_revers_iterat::operator--(int){
+	base_iterator tmp = this;
+	if (mode) {
+        	this->ptr = this->ptr->next;
+    	}
+    	else {
+        	this->ptr = this->ptr->asc;
+    	}
+    	return tmp;
+}
+
+
+template <typename T>
+vhuk::FrankList<T>::multi_revers_iterator::multi_revers_iterator(Node* ptr):const_multi_revers_iterator(ptr){}
+
 
 
 //} // namespace vhuk
