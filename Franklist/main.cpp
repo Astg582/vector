@@ -12,7 +12,7 @@ int main(){
 	ob.insert(ob.begin(), 5ull, 11);
 	std::cout << ob << std :: endl;
 //	ob.remove(11);
-	std::cout << *(ob.rfind(8)) << std::endl;
-//	ob.erase(ob.begin(), ob.end());
+	ob.rfind(6);
+	ob.print(1);
 	std::cout << ob << std :: endl;
 }

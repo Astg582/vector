@@ -637,7 +637,7 @@ typename vhuk::FrankList<T>::multi_reverse_iterator vhuk::FrankList<T>::mrdend()
 template <typename T>
 template <typename iter> 
 iter vhuk::FrankList<T>::insert(iter pos, size_type size, const_reference val){
-//static_assert(std::is_base_of<base_iterator, iter>::value == true, "uncorrect iterator");
+static_assert(std::is_base_of<base_iterator, iter>::value == true, "uncorrect iterator");
 	if(this->empty()){
 		throw std::invalid_argument("invalid arg");
 	}  
@@ -818,13 +818,13 @@ typename vhuk::FrankList<T>::iterator vhuk::FrankList<T>::find(const_reference e
 //rfind
 template <typename T>
 typename vhuk::FrankList<T>::iterator vhuk::FrankList<T>::rfind(const_reference elem){
-	reverse_iterator it = crbegin();
-	while (it != crend()) {
-	if( *it != elem){
+	reverse_iterator it = this->rbegin();
+	while (it != this->rend() && *it != elem){
 		++it;
-	}else {break;}
 	}
-	organize_right(it.ptr);
+	if (it != this->rend()) {
+		organize_right(it.ptr);
+	}
 	return iterator(it);
 }
 
@@ -947,25 +947,29 @@ void vhuk::FrankList<T>::organize_left(Node* ptr){
 template <typename T>
  void vhuk::FrankList<T>::organize_right(Node* ptr){
 	if(ptr == nullptr || ptr == tail){ return; }
-	Node* prev = ptr->prev;
-	Node* next = ptr->next;
-	if (prev){
-		if(next->next){
-			next->next->next = ptr;
-		}
-		next->next = ptr;
-		next->prev = prev;
-		ptr->next = next;
+	if(ptr->next != nullptr){
+		ptr->next->prev = ptr->prev;
 	}
-	if (prev){
-		prev->next = next;
+	if(ptr->prev != nullptr){
+		ptr->prev->next = ptr->next;
 	}
-	if (next == tail){
+	if(ptr->next == tail){
 		tail = ptr;
 	}
-	if (ptr == tail) {
-		head = next;
-	}	
+	if(ptr == head){
+		head = ptr->next;
+	}
+ 	Node* tempPrev = ptr->prev;
+	Node* tempNext = ptr->next;
+
+	ptr->prev = tempNext;
+	ptr->next = tempNext->next;
+	tempNext->next = ptr;
+
+
+	if (ptr->next != nullptr) {
+        ptr->next->prev = ptr;
+    }
  }
 
 
@@ -1025,7 +1029,7 @@ vhuk::FrankList<T>::base_iterator::~base_iterator()
 // !=
 template <typename T>
 bool vhuk::FrankList<T>::base_iterator::operator!=(const base_iterator& rhv) const {
-	return ptr != rhv.ptr;
+	return (this->ptr != rhv.ptr);
 }
 
 
@@ -1179,8 +1183,7 @@ typename vhuk::FrankList<T>::const_pointer vhuk::FrankList<T>::const_reverse_ite
 
 template <typename T>
 const typename vhuk::FrankList<T>::const_reverse_iterator& vhuk::FrankList<T>::const_reverse_iterator::operator++() {
-
-    --(*this); 
+    this->ptr = this->ptr->prev; 
     return *this;
 }
 
@@ -1188,7 +1191,7 @@ const typename vhuk::FrankList<T>::const_reverse_iterator& vhuk::FrankList<T>::c
 template <typename T>
 const typename vhuk::FrankList<T>::const_reverse_iterator vhuk::FrankList<T>::const_reverse_iterator::operator++(int) {
     const_reverse_iterator tmp = *this;
-    --(*this); 
+    this->ptr = this->ptr->prev;
     return tmp;
 }
 
